@@ -38,7 +38,7 @@ final class HttpClientTest extends TestCase
 
         $result = $client->domains()->list();
 
-        self::assertSame([], $result);
+        self::assertCount(0, $result);
         self::assertCount(2, $mock->getRequests());
     }
 
@@ -50,7 +50,7 @@ final class HttpClientTest extends TestCase
 
         $result = $client->domains()->list();
 
-        self::assertSame([], $result);
+        self::assertCount(0, $result);
     }
 
     public function testExhaustedNetworkErrorRetriesThrowNetworkException(): void

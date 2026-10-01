@@ -9,6 +9,7 @@ final class FtpAccount implements ModelInterface
     public function __construct(
         public readonly int $id,
         public readonly string $name,
+        public readonly string $username,
         public readonly string $dir,
     ) {
     }
@@ -18,6 +19,7 @@ final class FtpAccount implements ModelInterface
         return new self(
             id: (int) $data['id'],
             name: (string) $data['name'],
+            username: (string) ($data['username'] ?? $data['name']),
             dir: (string) $data['dir'],
         );
     }
@@ -27,6 +29,7 @@ final class FtpAccount implements ModelInterface
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'username' => $this->username,
             'dir' => $this->dir,
         ];
     }

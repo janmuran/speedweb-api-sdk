@@ -6,6 +6,7 @@ namespace JanMuran\SpeedwebApiSdk\Resource;
 
 use JanMuran\SpeedwebApiSdk\Model\Database;
 use JanMuran\SpeedwebApiSdk\Model\DatabaseUser;
+use JanMuran\SpeedwebApiSdk\Model\PaginatedCollection;
 use JanMuran\SpeedwebApiSdk\Model\Request\ChangeDatabaseUserPasswordRequest;
 
 /**
@@ -14,29 +15,29 @@ use JanMuran\SpeedwebApiSdk\Model\Request\ChangeDatabaseUserPasswordRequest;
 final class DatabasesResource extends AbstractResource
 {
     /**
-     * @return Database[]
+     * @return PaginatedCollection<Database>
      */
-    public function list(int $domainId): array
+    public function list(int $domainId, ?int $page = null, ?int $perPage = null): PaginatedCollection
     {
-        $data = $this->http->request('GET', "/api/v1/domains/{$domainId}/databases");
+        $data = $this->http->request('GET', "/api/v1/domains/{$domainId}/databases", [
+            'page' => $page,
+            'per_page' => $perPage,
+        ]);
 
-        return array_map(
-            static fn (array $item): Database => Database::fromArray($item),
-            $data['data'] ?? [],
-        );
+        return PaginatedCollection::fromArray($data, Database::class);
     }
 
     /**
-     * @return DatabaseUser[]
+     * @return PaginatedCollection<DatabaseUser>
      */
-    public function listUsers(int $domainId, int $databaseId): array
+    public function listUsers(int $domainId, int $databaseId, ?int $page = null, ?int $perPage = null): PaginatedCollection
     {
-        $data = $this->http->request('GET', "/api/v1/domains/{$domainId}/databases/{$databaseId}/users");
+        $data = $this->http->request('GET', "/api/v1/domains/{$domainId}/databases/{$databaseId}/users", [
+            'page' => $page,
+            'per_page' => $perPage,
+        ]);
 
-        return array_map(
-            static fn (array $item): DatabaseUser => DatabaseUser::fromArray($item),
-            $data['data'] ?? [],
-        );
+        return PaginatedCollection::fromArray($data, DatabaseUser::class);
     }
 
     public function changeUserPassword(

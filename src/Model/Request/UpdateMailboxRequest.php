@@ -7,23 +7,25 @@ namespace JanMuran\SpeedwebApiSdk\Model\Request;
 use InvalidArgumentException;
 use JanMuran\SpeedwebApiSdk\Model\ModelInterface;
 
-final class CreateMailboxRequest implements ModelInterface
+final class UpdateMailboxRequest implements ModelInterface
 {
     public function __construct(
-        public readonly string $localPart,
-        public readonly string $password,
+        public readonly ?string $password = null,
         public readonly ?int $quota = null,
     ) {
-        if (mb_strlen($password) < 6) {
+        if ($password !== null && mb_strlen($password) < 6) {
             throw new InvalidArgumentException('password must be at least 6 characters long.');
+        }
+
+        if ($password === null && $quota === null) {
+            throw new InvalidArgumentException('at least one of password or quota must be provided.');
         }
     }
 
     public static function fromArray(array $data): static
     {
         return new self(
-            localPart: (string) ($data['local_part'] ?? $data['email']),
-            password: (string) $data['password'],
+            password: isset($data['password']) ? (string) $data['password'] : null,
             quota: isset($data['quota']) ? (int) $data['quota'] : null,
         );
     }
@@ -32,7 +34,6 @@ final class CreateMailboxRequest implements ModelInterface
     {
         return array_filter(
             [
-                'local_part' => $this->localPart,
                 'password' => $this->password,
                 'quota' => $this->quota,
             ],

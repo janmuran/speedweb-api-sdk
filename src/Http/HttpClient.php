@@ -61,9 +61,10 @@ final class HttpClient
     /**
      * @param array<string, scalar|null> $query
      * @param array<string, mixed>|null $body
+     * @param array<string, string> $headers Extra request headers (e.g. Idempotency-Key), merged in last.
      * @return array<string, mixed>
      */
-    public function request(string $method, string $path, array $query = [], ?array $body = null): array
+    public function request(string $method, string $path, array $query = [], ?array $body = null, array $headers = []): array
     {
         $uri = rtrim($this->config->baseUri, '/') . '/' . ltrim($path, '/');
 
@@ -75,6 +76,10 @@ final class HttpClient
         $request = $this->requestFactory->createRequest($method, $uri)
             ->withHeader('Accept', 'application/json')
             ->withHeader('Authorization', 'Bearer ' . $this->config->apiKey);
+
+        foreach ($headers as $name => $value) {
+            $request = $request->withHeader($name, $value);
+        }
 
         if ($body !== null) {
             try {

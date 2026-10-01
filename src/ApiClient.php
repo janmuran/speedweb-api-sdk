@@ -10,6 +10,7 @@ use JanMuran\SpeedwebApiSdk\Resource\DatabasesResource;
 use JanMuran\SpeedwebApiSdk\Resource\DnsResource;
 use JanMuran\SpeedwebApiSdk\Resource\DomainsResource;
 use JanMuran\SpeedwebApiSdk\Resource\FtpResource;
+use JanMuran\SpeedwebApiSdk\Resource\InvoicesResource;
 use JanMuran\SpeedwebApiSdk\Resource\MailboxesResource;
 use JanMuran\SpeedwebApiSdk\Resource\SubusersResource;
 
@@ -28,6 +29,7 @@ final class ApiClient
     private ?FtpResource $ftp = null;
     private ?DatabasesResource $databases = null;
     private ?SubusersResource $subusers = null;
+    private ?InvoicesResource $invoices = null;
 
     public function __construct(
         private readonly ClientConfig $config,
@@ -88,5 +90,10 @@ final class ApiClient
     public function subusers(): SubusersResource
     {
         return $this->subusers ??= new SubusersResource($this->http);
+    }
+
+    public function invoices(): InvoicesResource
+    {
+        return $this->invoices ??= new InvoicesResource($this->http);
     }
 }

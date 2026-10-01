@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JanMuran\SpeedwebApiSdk\Resource;
 
 use JanMuran\SpeedwebApiSdk\Model\DnsRecord;
+use JanMuran\SpeedwebApiSdk\Model\PaginatedCollection;
 use JanMuran\SpeedwebApiSdk\Model\Request\CreateDnsRecordRequest;
 use JanMuran\SpeedwebApiSdk\Model\Request\UpdateDnsRecordRequest;
 
@@ -14,24 +15,25 @@ use JanMuran\SpeedwebApiSdk\Model\Request\UpdateDnsRecordRequest;
 final class DnsResource extends AbstractResource
 {
     /**
-     * @return DnsRecord[]
+     * @return PaginatedCollection<DnsRecord>
      */
-    public function list(int $domainId): array
+    public function list(int $domainId, ?int $page = null, ?int $perPage = null): PaginatedCollection
     {
-        $data = $this->http->request('GET', "/api/v1/domains/{$domainId}/dns-records");
+        $data = $this->http->request('GET', "/api/v1/domains/{$domainId}/dns-records", [
+            'page' => $page,
+            'per_page' => $perPage,
+        ]);
 
-        return array_map(
-            static fn (array $item): DnsRecord => DnsRecord::fromArray($item),
-            $data['data'] ?? [],
-        );
+        return PaginatedCollection::fromArray($data, DnsRecord::class);
     }
 
-    public function create(int $domainId, CreateDnsRecordRequest $request): DnsRecord
+    public function create(int $domainId, CreateDnsRecordRequest $request, ?string $idempotencyKey = null): DnsRecord
     {
         $data = $this->http->request(
             'POST',
             "/api/v1/domains/{$domainId}/dns-records",
             body: $request->toArray(),
+            headers: $idempotencyKey !== null ? ['Idempotency-Key' => $idempotencyKey] : [],
         );
 
         return DnsRecord::fromArray($data['data'] ?? []);
@@ -46,5 +48,10 @@ final class DnsResource extends AbstractResource
         );
 
         return DnsRecord::fromArray($data['data'] ?? []);
+    }
+
+    public function delete(int $domainId, int $recordId): void
+    {
+        $this->http->request('DELETE', "/api/v1/domains/{$domainId}/dns-records/{$recordId}");
     }
 }
